@@ -1,9 +1,20 @@
 import cv2
 
-def detect(path):
-    img = cv2.imread(path)
+camera_port = 0
+camera = cv2.VideoCapture(camera_port)
+camera.set(3,1280)
+camera.set(4,1024)
+
+def get_image():
+    retval, im = camera.read()
+    return im
+
+def detect():
+    img = get_image()
     cascade = cv2.CascadeClassifier("haarcascade_frontalface_alt.xml")
+    print "start"
     rects = cascade.detectMultiScale(img, 1.3, 4, cv2.cv.CV_HAAR_SCALE_IMAGE, (20,20))
+    print "stop"
     if len(rects) == 0:
         return [], img
     rects[:, 2:] += rects[:, :2]
@@ -14,23 +25,7 @@ def box(rects, img):
         cv2.rectangle(img, (x1, y1), (x2, y2), (127, 255, 0), 2)
     cv2.imwrite('detected.jpg', img);
 
-rects, img = detect("one.jpg")
+rects, img = detect()
 box(rects, img)
 
-
-camera_port = 0
-ramp_frames = 30
-camera = cv2.VideoCapture(camera_port)
-camera.set(3,1280)
-camera.set(4,1024)
-def get_image():
-    retval, im = camera.read()
-    return im
-
-for i in xrange(ramp_frames):
-    temp = get_image()
-print("Taking image...")
-camera_capture = get_image()
-file = "test_image.jpg"
-cv2.imwrite(file, camera_capture)
-
+while True:
